@@ -1,0 +1,333 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+     <meta charset="UTF-8" />
+    <title>Game in the making</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@2.1.0/dist/phaser.js"></script>
+    
+    <style type="text/css">
+        .phaser-example div{
+           margin: 0 auto;
+           width: 100%;
+        }  
+
+    </style>
+</head>
+
+
+<body>
+
+<div id="phaser-example" align="center"></div>
+
+
+<script type="text/javascript">
+  
+    var game = new Phaser.Game(800, 700, Phaser.AUTO, 'phaser-example', {preload: preload, create: create, update: update});
+
+    var tileSize = 90;
+
+    var leftBuffer = 0;
+    var rightBuffer = 0;
+    var upBuffer = 0;
+    var downBuffer = 0;
+
+
+
+    var change = 0;
+    var b1;
+    var b2;
+    var b3;
+    var b4;
+    var b5; 
+    var b6;
+
+    var g1;
+    var g2;
+    var g3;
+
+    var current = 0;
+
+
+    var pieces = [b1, b2, b3, b4, b5, b6];
+    var goalPieces = [g1, g2, g3];
+
+    var s1;
+    var s2;
+
+    var c1;
+    var c2;
+    var c3;
+
+    var static = [s1, s2];
+
+
+    var levelArray = [
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]
+
+    ];
+
+
+    var blocksArray = [
+         {
+              row: 4,
+              col: 0,
+              val: 1,
+         },
+         {
+              row: 4,
+              col: 1,
+              val: 2,
+         },
+         {
+              row: 4,
+              col: 2,
+              val: 3,
+         },
+         {
+              row: 3,
+              col: 0,
+              val: 4,
+         },
+         {
+              row: 3,
+              col: 1,
+              val: 5,
+         },
+         {
+              row: 3,
+              col: 2,
+              val: 6,
+         },
+    ]
+
+    c1 = '0x6033B5';
+    c2 = '0x33B560';
+    c3 = '0xB56033';
+
+
+
+    puzzle1 = [[c1, c2, c3],[[c3, 3], [c2, 2], [c1, 1], [c3, 3], [c1, 1], [c2, 2] ], [4, 6]];
+    var puzzle1f = [
+         [1, 2, 3],
+         [1, -1, 0],
+         [-1, 2, 3],
+         [0, 0, 0],
+         [0, 0, 0]
+
+    ];
+
+    function preload() {
+      game.load.image('grid', 'grid_1.png');
+      game.load.image('block', 'car_1.png');
+      game.load.image('win', 'win.png');
+      game.load.image('i1', 'instructions_1.png');
+      game.load.image('i2', 'instructions_2.png');
+      game.load.image('i3', 'instructions_3.png');
+    }
+
+
+    function create() {
+
+        //  A simple background for our game
+
+
+        grid = game.add.sprite(180, 100, 'grid');
+        
+         i1 = game.add.sprite(-70, 200, 'i1');
+
+        i2 = game.add.sprite(-70, 220, 'i2');
+
+        i3 = game.add.sprite(480, 200, 'i3');
+
+
+
+
+        console.log(i1);
+
+
+        for(i = 0; i < blocksArray.length; i ++){
+            pieces[i] = game.add.sprite(((blocksArray[i].col+1) * tileSize)+192, ((blocksArray[i].row+1) * tileSize)+95, "block");
+            
+            pieces[i].tint = puzzle1[1][i][0];
+            blocksArray[i].val = puzzle1[1][i][1];
+
+              
+            levelArray[blocksArray[i].row][blocksArray[i].col] = blocksArray[i].val;
+
+        }
+        
+        for(i = 0; i < puzzle1[0].length; i ++){
+
+            goalPieces[i] = game.add.sprite(tileSize*(i+1) + 192, tileSize, "block");
+            goalPieces[i].tint = puzzle1[0][i];
+
+        }
+
+        for(i = 0; i < puzzle1[2].length; i ++){
+          row = Math.floor(puzzle1[2][i]/3);
+          col = puzzle1[2][i]%3;
+          static[i] = game.add.sprite(tileSize*(col+1) + 192, tileSize*(row+1)+95, "block");
+          static[i].tint = '0x666666';
+          levelArray[row][col] = -1;
+
+        }
+
+
+        cursors = game.input.keyboard.createCursorKeys();
+
+
+    }
+
+    function update() {
+        var swap = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+
+
+        pieces[current].scale.setTo(0.8, 0.8);
+        
+
+        for( i = 0; i < pieces.length; i++){
+          if(i != current){
+            pieces[i].scale.setTo(1,1);
+
+          }
+        }
+       
+        row = blocksArray[current].row;
+        col = blocksArray[current].col;
+
+        
+
+        if (cursors.left.isDown && leftBuffer == 0 )
+        {
+            
+          if(col > 0){
+            if(levelArray[row][col-1] == 0){
+              pieces[current].x -= tileSize;
+              leftBuffer = 1;
+              levelArray[row][col] = 0;
+              levelArray[row][col-1] = blocksArray[current].val;
+              blocksArray[current].col = col-1;
+            }
+            
+          }
+
+            
+
+        }
+
+        if (cursors.up.isDown && upBuffer == 0 )
+        {
+          if(row > 0){
+            if(levelArray[row-1][col] == 0){
+              pieces[current].y -= tileSize;
+              upBuffer = 1;
+              levelArray[row][col] = 0;
+              levelArray[row-1][col] = blocksArray[current].val;
+              blocksArray[current].row = row - 1;
+            }
+            
+          }
+
+        }
+
+        if (cursors.down.isDown && downBuffer == 0 )
+        {
+            if(row < levelArray.length-1){
+              if(levelArray[row+1][col] == 0){
+                pieces[current].y += tileSize;
+                downBuffer = 1;
+                levelArray[row][col] = 0;
+                levelArray[row+1][col] = blocksArray[current].val;
+                blocksArray[current].row = row +1;
+              }
+              
+          }
+
+        }
+        if (cursors.right.isDown && rightBuffer == 0)
+        {
+           if(col < levelArray[0].length-1){
+            if(levelArray[row][col+1] == 0){
+              pieces[current].x += tileSize;
+              rightBuffer = 1;
+              levelArray[row][col] = 0;
+              levelArray[row][col+1] = blocksArray[current].val;
+              blocksArray[current].col = col + 1;
+            }
+            
+          }
+
+        }
+        if (cursors.right.isDown == false && rightBuffer == 1){
+          rightBuffer = 0;
+        }
+
+        if (cursors.left.isDown == false && leftBuffer == 1){
+          leftBuffer = 0;
+        }
+
+        if (cursors.up.isDown == false && upBuffer == 1){
+          upBuffer = 0;
+        }
+
+        if (cursors.down.isDown == false && downBuffer == 1){
+          downBuffer = 0;
+        }
+
+        if(swap.isDown && change == 0){
+          current += 1;
+          current = current % 6;
+          change = 1;
+        }
+
+        if (swap.isDown == false && change == 1){
+          change = 0;
+        }
+
+        var win = true;
+        
+        for(i=0; i< levelArray.length; i++){
+          for( var j = 0; j < levelArray[0].length; j++){
+            if(levelArray[i][j] != puzzle1f[i][j]){
+              win = false;
+            }
+          }
+        }
+
+        if(win){
+          for(i=0; i< pieces.length; i++){
+            pieces[i].destroy();
+          }
+
+          for(i=0; i< static.length; i++){
+            static[i].destroy();
+          }
+          for(i=0; i< goalPieces.length; i++){
+            goalPieces[i].destroy();
+          }
+
+          grid.destroy();
+
+          i1.destroy();
+          i2.destroy();
+          i3.destroy();
+
+          
+          game.add.sprite(100, 100, "win");
+
+        }
+
+        
+    }
+
+
+
+</script>
+</body>
+</html>
+
+
