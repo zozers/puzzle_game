@@ -120,6 +120,15 @@
 
     ];
 
+        var puzzle1f2 = [
+         [1, 2, 0],
+         [1, -1, 3],
+         [-1, 2, 3],
+         [0, 0, 0],
+         [0, 0, 0]
+
+    ];
+
     function preload() {
       game.load.image('grid', 'grid_1.png');
       game.load.image('block', 'car_1.png');
@@ -316,13 +325,54 @@
           i2.destroy();
           i3.destroy();
 
-          
           game.add.sprite(100, 100, "win");
-
         }
 
+
+
         
-    }
+        else{
+            win = true;
+            
+            for(i=0; i< levelArray.length; i++){
+              for( var j = 0; j < levelArray[0].length; j++){
+                if(levelArray[i][j] != puzzle1f2[i][j]){
+                  win = false;
+                }
+              }
+            }
+
+            if(win){
+              for(i=0; i< pieces.length; i++){
+                pieces[i].destroy();
+              }
+
+              for(i=0; i< static.length; i++){
+                static[i].destroy();
+              }
+              for(i=0; i< goalPieces.length; i++){
+                goalPieces[i].destroy();
+              }
+
+              grid.destroy();
+
+              i1.destroy();
+              i2.destroy();
+              i3.destroy();
+
+              game.add.sprite(100, 100, "win");
+
+
+
+            }
+          
+          }
+
+         
+      }
+
+        
+
 
 
 
